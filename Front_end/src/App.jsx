@@ -1,17 +1,22 @@
-// Frontend: ChatApp.jsx (React + Vite + Tailwind)
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:25565');
+const socket = io('http://localhost:25565'); // Vervang localhost met LAN-IP voor andere users
 
 const ChatApp = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
 
     useEffect(() => {
-        socket.on('chat message', (msg) => {
+        const handleMessage = (msg) => {
             setMessages((prev) => [...prev, msg]);
-        });
+        };
+
+        socket.on('chat message', handleMessage);
+
+        return () => {
+            socket.off('chat message', handleMessage);
+        };
     }, []);
 
     const sendMessage = () => {
