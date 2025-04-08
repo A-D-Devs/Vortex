@@ -17,17 +17,17 @@ const io = new Server(server, {
 app.use(cors());
 
 io.on('connection', (socket) => {
-  console.log('✅ User connected:', socket.id);
+  console.log(' User connected:', socket.id);
 
   socket.on('chat message', (msg) => {
     io.emit('chat message', msg);
   });
 
   socket.on('disconnect', () => {
-    console.log('❌ User disconnected:', socket.id);
+    console.log(' User disconnected:', socket.id);
   });
 });
 
 server.listen(25565, '0.0.0.0', () => {
-  console.log('🚀 Server running on http://localhost:25565');
+  console.log(' Server running on http://localhost:25565');
 });
