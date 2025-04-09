@@ -6,7 +6,6 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 
-// Socket.io setup met CORS
 const io = new Server(server, {
   cors: {
     origin: '*',
@@ -16,18 +15,34 @@ const io = new Server(server, {
 
 app.use(cors());
 
-io.on('connection', (socket) => {
-  console.log(' User connected:', socket.id);
+// Map to store connected usernames
+const users = new Map();
 
-  socket.on('chat message', (msg) => {
-    io.emit('chat message', msg);
+io.on('connection', (socket) => {
+  console.log('User connected:', socket.id);
+
+  // Handle setting username
+  socket.on('set username', (username) => {
+    users.set(socket.id, username);
+    console.log(`User ${socket.id} set username to ${username}`);
   });
 
+  // Handle chat message
+  socket.on('chat message', (msg) => {
+    const username = users.get(socket.id) || 'Anonymous';
+    io.emit('chat message', {
+      username,
+      message: msg
+    });
+  });
+
+  // Handle disconnect
   socket.on('disconnect', () => {
-    console.log(' User disconnected:', socket.id);
+    console.log('User disconnected:', socket.id);
+    users.delete(socket.id);
   });
 });
 
 server.listen(25565, '0.0.0.0', () => {
-  console.log(' Server running on http://localhost:25565');
+  console.log('Server running on http://localhost:25565');
 });

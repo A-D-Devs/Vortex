@@ -6,8 +6,16 @@ const socket = io('http://localhost:25565'); // Vervang localhost met LAN-IP voo
 const ChatApp = () => {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
+    const [username, setUsername] = useState('');
 
     useEffect(() => {
+        // Prompt for username once when component mounts
+        const name = prompt('Enter your username');
+        if (name) {
+            setUsername(name);
+            socket.emit('set username', name);
+        }
+
         const handleMessage = (msg) => {
             setMessages((prev) => [...prev, msg]);
         };
@@ -32,7 +40,9 @@ const ChatApp = () => {
                 <h1 className="text-xl font-bold mb-4">Vortex Chat</h1>
                 <div className="h-64 overflow-y-auto bg-gray-700 p-2 rounded-lg">
                     {messages.map((msg, index) => (
-                        <p key={index} className="p-1">{msg}</p>
+                        <p key={index} className="p-1">
+                            <span className="font-semibold text-blue-400">{msg.username}:</span> {msg.message}
+                        </p>
                     ))}
                 </div>
                 <input 
